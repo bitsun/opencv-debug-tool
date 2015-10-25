@@ -1,0 +1,228 @@
+;the visualizer config files of VC++ for opencv projects
+;with this we can look at the values opencv matrix ,images directly in VC debugger
+;------------------------------------------------------------------------------
+;  cv::Mat from opencv
+;------------------------------------------------------------------------------
+cv::Vec<unsigned char,3>{
+	preview (#(
+		[$e.val[0],u],
+		",",
+		[$e.val[1],u],
+		",",
+		[$e.val[2],u]
+	))
+}
+cv::Vec<int,3>{
+	preview (#(
+		[$e.val[0],u],
+		",",
+		[$e.val[1],u],
+		",",
+		[$e.val[2],u]
+	))
+}
+cv::Vec<float,3>{
+	preview (#(
+		[$e.val[0],u],
+		",",
+		[$e.val[1],u],
+		",",
+		[$e.val[2],u]
+	))
+}
+cv::Vec<double,3>{
+	preview (#(
+		[$e.val[0],u],
+		",",
+		[$e.val[1],u],
+		",",
+		[$e.val[2],u]
+	))
+}
+cv::Mat{
+	preview(
+		#(
+			"Type ",
+			;depth
+			#switch ($e.flags & 7)
+			#case 0 (#("8U"))
+			#case 1 (#("8S"))
+			#case 2 (#("16U"))
+			#case 3 (#("16S"))
+			#case 4 (#("32S"))
+			#case 5 (#("32F"))
+			#case 6 (#("64F"))
+			#default (#("depth unknown "))
+			,"_C",
+			;channel
+			((($e.flags) & 511<<3) >> 3) + 1,
+			" Width ",
+			$e.cols,
+			" Height ",
+			$e.rows,
+			" Step ",
+			$e.step.p[0]
+		)
+	)
+	
+	children(
+	;only visualize if it is two dimensions
+	#switch ($e.flags & 7)
+		#case 0 
+			(
+			#switch(((($e.flags) & 511<<3) >> 3) + 1)
+			#case 1
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: ($e.data)[(($i/$e.cols)*($e.step.p[0])+($i%$e.rows))],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#case 2
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: [($e.data)+(($i/$e.cols)*($e.step.p[0])+($i%$e.rows)*2),2],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#case 3 
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: [($e.data)+(($i/$e.cols)*($e.step.p[0])+($i%$e.rows)*3),3],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#case 4
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: [($e.data)+(($i/$e.cols)*($e.step.p[0])+($i%$e.rows)*4),4],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#default(
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: ($e.data)[$i],
+					size: ($r==1)*($e.step.p[0])+($r==0)*$e.rows
+				))
+				)
+			)
+		#case 1
+			(#array(
+				rank: 2,
+				base: 0,
+				expr: ((char*)($e.data))[$i],
+				size: ($r==1)*($e.step.p[0])+($r==0)*$e.rows
+			))
+		#case 2
+			(#array(
+				rank: 2,
+				base: 0,
+				expr: ((short*)($e.data))[$i],
+				;sizeof(short)=4
+				size: ($r==1)*($e.step.p[0]/2)+($r==0)*$e.rows
+			))
+		#case 3
+			(#array(
+				rank: 2,
+				base: 0,
+				expr: ((unsigned short*)($e.data))[$i],
+				;sizeof(unsigned short)=4
+				size: ($r==1)*($e.step.p[0]/2)+($r==0)*$e.rows
+			))
+		#case 4
+			(#array(
+				rank: 2,
+				base: 0,
+				expr: ((int*)($e.data))[$i],
+				;sizeof(int)=4
+				size: ($r==1)*($e.step.p[0]/4)+($r==0)*$e.rows
+			))
+		#case 5
+			(
+			#switch(((($e.flags) & 511<<3) >> 3) + 1)
+			#case 1
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: ((float*)($e.data))[(($i%$e.cols)*($e.step.p[0]/4)+($i/$e.cols))],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#case 2
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: [((float*)($e.data))+(($i%$e.cols)*($e.step.p[0]/4)+($i/$e.cols)*2),2],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#case 3 
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: [((float*)($e.data))+(($i%$e.cols)*($e.step.p[0]/4)+($i/$e.cols)*3),3],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#case 4
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: [((float*)($e.data))+(($i%$e.cols)*($e.step.p[0]/4)+($i/$e.cols)*4),4],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#default(
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: ((float*)($e.data))[$i],
+					size: ($r==1)*($e.step.p[0]/4)+($r==0)*$e.rows
+				))
+				)
+			)
+		#case 6
+			(
+			#switch(((($e.flags) & 511<<3) >> 3) + 1)
+			#case 1
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: ((double*)($e.data))[(($i%$e.cols)*($e.step.p[0]/8)+($i/$e.cols))],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#case 2
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: [((double*)($e.data))+(($i%$e.cols)*($e.step.p[0]/8)+($i/$e.cols)*2),2],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#case 3 
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: [((double*)($e.data))+(($i%$e.cols)*($e.step.p[0]/8)+($i/$e.cols)*3),3],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#case 4
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: [((double*)($e.data))+(($i%$e.cols)*($e.step.p[0]/8)+($i/$e.cols)*4),4],
+					size: ($r==1)*$e.cols+($r==0)*$e.rows
+				))
+			#default(
+				(#array(
+					rank: 2,
+					base: 0,
+					expr: ((double*)($e.data))[$i],
+					size: ($r==1)*($e.step.p[0]/8)+($r==0)*$e.rows
+				))
+				)
+			)
+		#default
+			(#array(
+				expr: 0,
+				size: 0
+			))
+	)
+}
