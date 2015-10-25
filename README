@@ -1,0 +1,1 @@
+This project includes a VC debugger configuration files for opencv projects so that values of opencv matrix,vectors, images can be viewed directly in debugger
